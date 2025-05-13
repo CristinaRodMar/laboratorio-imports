@@ -1,7 +1,6 @@
 import "./style.css";
 
-import { dameCarta, plantarse} from './motor';
-import { botonNuevoJuego, boton, botonPlantarse, iniciarNuevaPartida} from './ui';
+import { botonNuevoJuego, boton, botonPlantarse, iniciarNuevaPartida, dameCarta, plantarse } from './ui';
 
 if (boton instanceof HTMLButtonElement) {
     boton.addEventListener("click", dameCarta);

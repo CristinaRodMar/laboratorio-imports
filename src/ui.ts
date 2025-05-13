@@ -1,4 +1,5 @@
-import { puntuacion, mostrarUrlCarta, actualizaPuntuacion } from './modelo';
+import { partida } from './modelo';
+import { dameNumeroAleatorio, dameNumeroCarta, obtenerPuntosCarta, sumaPuntuacion, actualizaPuntuacion } from './motor';
 
 export const mensajeGameOver = document.getElementById("game-over");
 export const botonNuevoJuego = document.getElementById("new-game");
@@ -6,14 +7,22 @@ export const boton = document.getElementById("order-card");
 export const botonPlantarse = document.getElementById("stand");
 export const mensajePlantarse = document.getElementById("mensaje-plantarse");
 
-export function muestraPuntuacion(): void {
+function muestraPuntuacion(): void {
     const scoreElement = document.getElementById("score");
     if (scoreElement !== null && scoreElement instanceof HTMLElement) {
-        scoreElement.textContent = puntuacion.toString();
+        scoreElement.textContent = partida.puntuacion.toString();
     }
 }
 
-export function mostrarGameOver(): void {
+const mostrarUrlCarta = (urlCarta: string) => {
+    const cardImage = document.getElementById("card-image");
+    if (cardImage instanceof HTMLImageElement) {
+        cardImage.src = urlCarta;
+    }
+};
+
+
+function mostrarGameOver(): void {
     if (mensajeGameOver instanceof HTMLElement && botonNuevoJuego instanceof HTMLButtonElement) {
         mensajeGameOver.textContent = "Game Over";
         mensajeGameOver.style.display = "block";
@@ -21,21 +30,21 @@ export function mostrarGameOver(): void {
     }
 }
 
-export function bloquearBotones(): void {
+function bloquearBotones(): void {
     if (boton instanceof HTMLButtonElement && botonPlantarse instanceof HTMLButtonElement) {
         boton.disabled = true;
         botonPlantarse.disabled = true;
     }
 }
 
-export function activarBotones(): void {
+function activarBotones(): void {
     if (boton instanceof HTMLButtonElement && botonPlantarse instanceof HTMLButtonElement) {
         boton.disabled = false;
         botonPlantarse.disabled = false;
     }
 }
 
-export function mostrarMensaje(mensaje: string) {
+function mostrarMensaje(mensaje: string) {
     const mensajePlantarse = document.getElementById("mensaje-plantarse");
     if (mensajePlantarse instanceof HTMLDivElement) {
         mensajePlantarse.textContent = mensaje;
@@ -43,7 +52,7 @@ export function mostrarMensaje(mensaje: string) {
     }
 }
 
-export function obtenerUrlCarta(number: number): string {
+function obtenerUrlCarta(number: number): string {
     switch (number) {
         case 1: return "https://raw.githubusercontent.com/Lemoncode/fotos-ejemplos/main/cartas/copas/1_as-copas.jpg";
         case 2: return "https://raw.githubusercontent.com/Lemoncode/fotos-ejemplos/main/cartas/copas/2_dos-copas.jpg";
@@ -59,7 +68,7 @@ export function obtenerUrlCarta(number: number): string {
     }
 }
 
-export function ocultarMensajes(): void {
+function ocultarMensajes(): void {
     if (mensajeGameOver instanceof HTMLElement) {
         mensajeGameOver.style.display = "none";
     }
@@ -80,4 +89,48 @@ export function iniciarNuevaPartida(): void {
     }
 
     mostrarUrlCarta("https://raw.githubusercontent.com/Lemoncode/fotos-ejemplos/main/cartas/back.jpg");
+}
+
+function revisarPartida() {
+    if (partida.puntuacion > 7.5) {
+        mostrarMensaje("Game Over");
+        mostrarGameOver();
+        bloquearBotones();
+    } else if (partida.puntuacion === 7.5) {
+        mostrarMensaje("¡Lo has clavado! ¡Enhorabuena!");
+        mostrarGameOver();
+        bloquearBotones();
+    }
+}
+
+function mostrarMensajePlantarse(): void {
+    if (partida.puntuacion < 4) {
+        mostrarMensaje("Has sido muy conservador");
+    } else if (partida.puntuacion === 5) {
+        mostrarMensaje("Te ha entrado el canguelo eh?");
+    } else if (partida.puntuacion >= 6 && partida.puntuacion < 7) {
+        mostrarMensaje("Casi casi...");
+    } else if (partida.puntuacion === 7.5) {
+        mostrarMensaje("¡Lo has clavado! ¡Enhorabuena!");
+    }
+}
+
+export function dameCarta(): void {
+    const numeroAleatorio = dameNumeroAleatorio();
+    const carta = dameNumeroCarta(numeroAleatorio);
+    const urlCarta = obtenerUrlCarta(carta);
+    mostrarUrlCarta(urlCarta);
+    const puntosCarta = obtenerPuntosCarta(carta);
+    const puntosSumados = sumaPuntuacion(puntosCarta);
+    actualizaPuntuacion(puntosSumados);
+    muestraPuntuacion();
+    revisarPartida();
+}
+
+export function plantarse() {
+    mostrarMensajePlantarse();
+    bloquearBotones();
+    if (botonNuevoJuego instanceof HTMLButtonElement) {
+        botonNuevoJuego.style.display = "inline-block";
+    }
 }
